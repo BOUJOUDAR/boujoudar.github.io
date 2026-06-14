@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mohamed Boujoudar — AI Researcher & PhD Candidate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050a14;
+      --bg2: #080f1e;
+      --bg3: #0d1628;
+      --surface: rgba(13, 22, 40, 0.7);
+      --border: rgba(56, 139, 253, 0.15);
+      --border-hover: rgba(56, 139, 253, 0.4);
+      --blue: #388bfd;
+      --blue-glow: rgba(56, 139, 253, 0.3);
+      --cyan: #39d0d8;
+      --cyan-glow: rgba(57, 208, 216, 0.25);
+      --green: #3fb950;
+      --purple: #a371f7;
+      --orange: #f0883e;
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+      --text-dim: #484f58;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── CANVAS BACKGROUND ── */
+    #neural-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 3px; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(5, 10, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    nav .inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--blue);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+    .nav-logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 100%;
+      height: 1px;
+      background: var(--blue);
+      transition: right 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { right: 0; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 100px 0 60px;
+    }
+    .hero-content { max-width: 780px; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--cyan);
+      background: rgba(57, 208, 216, 0.08);
+      border: 1px solid rgba(57, 208, 216, 0.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-tag::before { content: '●'; font-size: 8px; animation: pulse 2s ease infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero-name {
+      font-size: clamp(42px, 7vw, 72px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero-name .highlight {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 50%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-title {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+    .hero-title .role { color: var(--blue); font-weight: 500; }
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s 0.35s ease both;
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1;
+      font-family: var(--mono);
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(56, 139, 253, 0.4);
+    }
+    .btn-primary:hover {
+      background: #4fa0ff;
+      box-shadow: 0 0 30px rgba(56, 139, 253, 0.6);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+      background: rgba(56, 139, 253, 0.05);
+      transform: translateY(-1px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 90px 0; position: relative; z-index: 1; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--blue);
+    }
+    .section-title {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── GLASS CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 32px rgba(56, 139, 253, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* ── ABOUT ── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-card { }
+    .about-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      margin-bottom: 12px;
+      font-family: var(--mono);
+    }
+    .about-card p { color: var(--text-muted); line-height: 1.7; }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .contact-item svg { color: var(--blue); flex-shrink: 0; }
+    .contact-item a { color: var(--text-muted); text-decoration: none; }
+    .contact-item a:hover { color: var(--blue); }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px; bottom: 8px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--blue), var(--purple));
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 44px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -29px;
+      top: 6px;
+      width: 14px; height: 14px;
+      background: var(--bg);
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--blue-glow);
+      transition: all 0.2s;
+    }
+    .timeline-item:hover .timeline-dot {
+      background: var(--blue);
+      box-shadow: 0 0 16px var(--blue);
+    }
+    .timeline-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .timeline-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .timeline-org {
+      font-size: 13px;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+    .timeline-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .timeline-desc ul { padding-left: 18px; margin-top: 8px; }
+    .timeline-desc li { margin-bottom: 4px; }
+    .badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+      margin: 4px 4px 0 0;
+    }
+    .badge-blue { color: var(--blue); border-color: rgba(56,139,253,0.35); background: rgba(56,139,253,0.07); }
+    .badge-green { color: var(--green); border-color: rgba(63,185,80,0.35); background: rgba(63,185,80,0.07); }
+    .badge-purple { color: var(--purple); border-color: rgba(163,113,247,0.35); background: rgba(163,113,247,0.07); }
+    .badge-cyan { color: var(--cyan); border-color: rgba(57,208,216,0.35); background: rgba(57,208,216,0.07); }
+    .badge-orange { color: var(--orange); border-color: rgba(240,136,62,0.35); background: rgba(240,136,62,0.07); }
+
+    /* ── SKILLS ── */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .skill-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .skill-icon { font-size: 18px; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-tag {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(56, 139, 253, 0.07);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .skill-tag:hover {
+      background: rgba(56, 139, 253, 0.15);
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+
+    /* ── PUBLICATIONS ── */
+    .pub-filter {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--sans);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(56, 139, 253, 0.08);
+    }
+    .pub-list { display: flex; flex-direction: column; gap: 16px; }
+    .pub-card {
+      display: flex;
+      gap: 20px;
+      padding: 20px 24px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s;
+    }
+    .pub-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 4px 20px rgba(56, 139, 253, 0.08);
+      transform: translateX(4px);
+    }
+    .pub-number {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--border);
+      min-width: 28px;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+    .pub-body { flex: 1; min-width: 0; }
+    .pub-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+    .pub-authors {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .pub-authors strong { color: var(--blue); }
+    .pub-venue {
+      font-size: 12px;
+      color: var(--cyan);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .pub-doi {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+    .pub-doi:hover { color: var(--blue); }
+
+    /* ── PROJECTS ── */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .project-card { display: flex; flex-direction: column; }
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .project-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+    .project-year {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+    .project-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .project-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 14px;
+    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* ── PATENT ── */
+    .patent-card {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .patent-seal {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, rgba(240,136,62,0.15), rgba(163,113,247,0.15));
+      border: 1px solid rgba(240,136,62,0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .patent-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .patent-info p { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .patent-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--green);
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.25);
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-top: 8px;
+    }
+    .patent-status::before { content: '●'; font-size: 8px; }
+
+    /* ── REFERENCES ── */
+    .ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .ref-card {}
+    .ref-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+    .ref-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .ref-role { font-size: 12px; color: var(--blue); margin-bottom: 4px; }
+    .ref-org { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .ref-email {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ref-email:hover { color: var(--cyan); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    footer p { color: var(--text-dim); font-size: 13px; font-family: var(--mono); }
+    footer p a { color: var(--blue); text-decoration: none; }
+
+    /* ── PROGRESS BAR (language) ── */
+    .lang-item { margin-bottom: 16px; }
+    .lang-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .lang-name { font-size: 13px; font-weight: 500; }
+    .lang-level { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
+    .lang-bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+    .lang-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--cyan)); transition: width 1s ease; }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .pub-card { flex-direction: column; gap: 10px; }
+      .patent-card { flex-direction: column; }
+      .hero-stats { gap: 20px; }
+    }
+
+    /* ── GLOWING DIVIDER ── */
+    .glow-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--cyan), transparent);
+      margin: 0;
+      opacity: 0.4;
+    }
+
+    /* ── TYPED CURSOR ── */
+    .typed-cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--cyan);
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.5;
+      animation: float 2s ease-in-out infinite;
+    }
+    .scroll-indicator span { font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); }
+    @keyframes float {
+      0%,100%{transform:translateX(-50%) translateY(0)}
+      50%{transform:translateX(-50%) translateY(6px)}
+    }
+
+    /* ── ACTIVE NAV ── */
+    .nav-links a.active { color: var(--blue); }
+  </style>
+</head>
+<body>
+
+<!-- Neural Network Canvas -->
+<canvas id="neural-canvas"></canvas>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <div class="inner">
+    <a href="#hero" class="nav-logo">MB<span>.</span>dev</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#patent">Patent</a></li>
+      <li><a href="#references">References</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ─────────────────── HERO ─────────────────── -->
+<section id="hero" style="position:relative;">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag">PhD Researcher · AI &amp; Renewable Energy</div>
+      <h1 class="hero-name">
+        Mohamed<br /><span class="highlight">Boujoudar</span>
+      </h1>
+      <p class="hero-title">
+        <span class="role" id="typed-role"></span><span class="typed-cursor"></span>
+      </p>
+      <p class="hero-desc">
+        Developing AI-powered predictive maintenance systems for Concentrated Solar Power plants.
+        Bridging computer science, deep learning, and renewable energy at Green Energy Park, Morocco.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">10+</div>
+          <div class="stat-label">Journal Papers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Patent</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3+</div>
+          <div class="stat-label">Years PhD</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">27/12/2025</div>
+          <div class="stat-label">Thesis Defence</div>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="#publications" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          View Publications
+        </a>
+        <a href="mailto:Mohamed.boujoudar1@usmba.ac.ma" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Get in Touch
+        </a>
+        <a href="https://linkedin.com" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>SCROLL</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ─────────────────── ABOUT ─────────────────── -->
+<section id="about">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2 class="section-title">About Me</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="card about-card reveal">
+        <h3>// Profile</h3>
+        <p>PhD researcher specializing in the application of artificial intelligence and computer vision to predictive maintenance of Concentrated Solar Power (CSP) plants. Currently at Green Energy Park (UM6P), Benguerir, Morocco, funded by a competitive scholarship.</p>
+        <br />
+        <p>My work sits at the intersection of deep learning, IoT, image processing, and renewable energy systems — with a track record of peer-reviewed publications in high-impact journals including <em>Solar Energy</em>, <em>Neural Computing and Applications</em>, and <em>The Visual Computer</em>.</p>
+      </div>
+      <div class="card about-card reveal" style="transition-delay:0.1s">
+        <h3>// Contact</h3>
+        <div class="contact-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:Mohamed.boujoudar1@usmba.ac.ma">Mohamed.boujoudar1@usmba.ac.ma</a>
+        </div>
+        <div class="contact-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.63 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.01z"/></svg>
+          +212 651 748 365
+        </div>
+        <div class="contact-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Fez, Morocco
+        </div>
+        <div class="contact-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          <a href="https://linkedin.com">LinkedIn Profile</a>
+        </div>
+        <br />
+        <h3>// Languages</h3>
+        <div class="lang-item">
+          <div class="lang-header"><span class="lang-name">Arabic</span><span class="lang-level">Native</span></div>
+          <div class="lang-bar"><div class="lang-fill" data-width="100%" style="width:0%"></div></div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header"><span class="lang-name">French</span><span class="lang-level">Fluent</span></div>
+          <div class="lang-bar"><div class="lang-fill" data-width="90%" style="width:0%"></div></div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header"><span class="lang-name">English</span><span class="lang-level">Fluent</span></div>
+          <div class="lang-bar"><div class="lang-fill" data-width="88%" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── EDUCATION ─────────────────── -->
+<section id="education" style="background: rgba(8,15,30,0.5);">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Education</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2021 — 2025</div>
+        <div class="timeline-title">Ph.D in Computer Science, Electrical Engineering &amp; Renewable Energy</div>
+        <div class="timeline-org">Faculty of Science and Technology (FST), Fez · USMBA</div>
+        <div class="timeline-desc">
+          <strong style="color:var(--text)">Thesis:</strong> Development of new predictive maintenance methods for Concentrated Solar Power (CSP) plants using AI and image processing algorithms.
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">Deep Learning</span>
+            <span class="badge badge-cyan">Computer Vision</span>
+            <span class="badge badge-green">CSP Systems</span>
+            <span class="badge badge-purple">IoT</span>
+            <span class="badge badge-orange">Scholarship Funded</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2019 — 2021</div>
+        <div class="timeline-title">M.Sc. Computer Science — IoT and Mobile Systems</div>
+        <div class="timeline-org">ENSA Fez · Sidi Mohamed Ben Abdellah University</div>
+        <div class="timeline-desc">
+          Specialized in Internet of Things architectures and mobile systems development.
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">IoT</span>
+            <span class="badge badge-cyan">Mobile Systems</span>
+            <span class="badge badge-green">Web Services</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2013 — 2017</div>
+        <div class="timeline-title">Bachelor's Degree — Electronics &amp; Physics</div>
+        <div class="timeline-org">FSDM Fez · Sidi Mohamed Ben Abdellah University</div>
+        <div class="timeline-desc">
+          Foundation in electronics, physics, and applied sciences.
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">Electronics</span>
+            <span class="badge badge-cyan">Physics</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── EXPERIENCE ─────────────────── -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2022 — 2025</div>
+        <div class="timeline-title">PhD Researcher — Scholarship</div>
+        <div class="timeline-org">Green Energy Park · UM6P, Benguerir, Morocco</div>
+        <div class="timeline-desc">
+          Developing new predictive maintenance methods based on artificial intelligence for CSP plants.
+          <ul>
+            <li>Conducting research on operation and maintenance for CSP plants using AI</li>
+            <li>Proficient in Python for data analysis and machine learning pipelines</li>
+            <li>Applying deep learning and image processing for soiling detection on solar mirrors</li>
+            <li>Published 10+ journal articles in high-impact international journals</li>
+          </ul>
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">Python</span>
+            <span class="badge badge-cyan">TensorFlow</span>
+            <span class="badge badge-green">YOLOv8</span>
+            <span class="badge badge-purple">Computer Vision</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2021</div>
+        <div class="timeline-title">End of Study Internship — IoT Platform Developer</div>
+        <div class="timeline-org">Green Energy Park · Benguerir (Solar Decathlon Africa)</div>
+        <div class="timeline-desc">
+          Developed an IoT platform for monitoring the solar village at Solar Decathlon Africa.
+          <ul>
+            <li>Developed IoT platform for real-time monitoring</li>
+            <li>Implemented maintenance policies for electricity and data communication restoration</li>
+            <li>Designed a SCADA-based HMI and a web-based IoT platform</li>
+          </ul>
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">IoT</span>
+            <span class="badge badge-cyan">SCADA</span>
+            <span class="badge badge-green">HMI</span>
+            <span class="badge badge-orange">Real-time Monitoring</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2017</div>
+        <div class="timeline-title">End of Study Internship — Simulation Engineer</div>
+        <div class="timeline-org">Faculty of Sciences · Fez</div>
+        <div class="timeline-desc">
+          Modeled Li-ion batteries using MATLAB Simulink for electrochemical behavior analysis.
+          <div style="margin-top:10px;">
+            <span class="badge badge-blue">MATLAB</span>
+            <span class="badge badge-cyan">Simulink</span>
+            <span class="badge badge-green">Li-ion Batteries</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── SKILLS ─────────────────── -->
+<section id="skills" style="background: rgba(8,15,30,0.5);">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Technical Skills</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="card skill-card reveal">
+        <h3><span class="skill-icon">🤖</span> AI &amp; Machine Learning</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">TensorFlow</span>
+          <span class="skill-tag">Keras</span>
+          <span class="skill-tag">YOLOv8</span>
+          <span class="skill-tag">OpenCV</span>
+          <span class="skill-tag">Scikit-learn</span>
+          <span class="skill-tag">CNN</span>
+          <span class="skill-tag">SAM</span>
+        </div>
+      </div>
+      <div class="card skill-card reveal" style="transition-delay:0.05s">
+        <h3><span class="skill-icon">📊</span> Data Science</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">NumPy</span>
+          <span class="skill-tag">Pandas</span>
+          <span class="skill-tag">SciPy</span>
+          <span class="skill-tag">R</span>
+          <span class="skill-tag">MATLAB</span>
+          <span class="skill-tag">Simulink</span>
+          <span class="skill-tag">Data Visualization</span>
+        </div>
+      </div>
+      <div class="card skill-card reveal" style="transition-delay:0.1s">
+        <h3><span class="skill-icon">🌐</span> Web &amp; IoT Development</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">HTML/CSS</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">PHP</span>
+          <span class="skill-tag">Java</span>
+          <span class="skill-tag">JAX-WS</span>
+          <span class="skill-tag">Apache</span>
+          <span class="skill-tag">IoT</span>
+          <span class="skill-tag">SCADA</span>
+        </div>
+      </div>
+      <div class="card skill-card reveal" style="transition-delay:0.15s">
+        <h3><span class="skill-icon">🗄️</span> Databases &amp; Systems</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">MySQL</span>
+          <span class="skill-tag">PostgreSQL</span>
+          <span class="skill-tag">SQLite</span>
+          <span class="skill-tag">HSQL</span>
+          <span class="skill-tag">SQL</span>
+          <span class="skill-tag">XML/XSL</span>
+        </div>
+      </div>
+      <div class="card skill-card reveal" style="transition-delay:0.2s">
+        <h3><span class="skill-icon">☀️</span> Solar Energy Systems</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">CSP Plants</span>
+          <span class="skill-tag">Parabolic Trough</span>
+          <span class="skill-tag">Fresnel Reflectors</span>
+          <span class="skill-tag">Solar Tracking</span>
+          <span class="skill-tag">O&amp;M</span>
+          <span class="skill-tag">PV Systems</span>
+        </div>
+      </div>
+      <div class="card skill-card reveal" style="transition-delay:0.25s">
+        <h3><span class="skill-icon">🤝</span> Research &amp; Soft Skills</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Academic Research</span>
+          <span class="skill-tag">Teaching</span>
+          <span class="skill-tag">Publishing</span>
+          <span class="skill-tag">Team Collaboration</span>
+          <span class="skill-tag">Consultation</span>
+          <span class="skill-tag">Technical Writing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── PUBLICATIONS ─────────────────── -->
+<section id="publications">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Research Publications</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="pub-filter reveal">
+      <button class="filter-btn active" data-filter="all">All (13)</button>
+      <button class="filter-btn" data-filter="journal">Journal Articles (10)</button>
+      <button class="filter-btn" data-filter="conference">Conference (1)</button>
+      <button class="filter-btn" data-filter="book">Book Chapters (2)</button>
+    </div>
+    <div class="pub-list" id="pub-list">
+
+      <!-- JOURNAL ARTICLES -->
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">01</div>
+        <div class="pub-body">
+          <div class="pub-title">Techno-economic assessment of vegetable oils as heat transfer fluids for industrial solar thermal systems applications</div>
+          <div class="pub-authors">I. Bouarfa, M. El Ydrissi, A. Moulay Taj, <strong>Boujoudar M.</strong>, E.G. Bennouna, A. Jamil</div>
+          <div class="pub-venue">Results in Engineering, vol. 29, p. 108488 · 2026</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.rineng.2025.108488">doi:10.1016/j.rineng.2025.108488</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">Solar Thermal</span><span class="badge badge-green">Heat Transfer</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">02</div>
+        <div class="pub-body">
+          <div class="pub-title">AI fault detection in CSP with simulation-based fault injection on a 1 MWe Fresnel-ORC plant</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, A. Moulay Taj, I. Bouarfa, M. El Ydrissi, A. Dadda, M. Abraim, E.G. Bennouna, H. Ghennioui</div>
+          <div class="pub-venue">Solar Energy, vol. 303, p. 114089 · 2026</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.solener.2025.114089">doi:10.1016/j.solener.2025.114089</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">AI Fault Detection</span><span class="badge badge-cyan">CSP</span><span class="badge badge-green">Fresnel</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">03</div>
+        <div class="pub-body">
+          <div class="pub-title">Advanced detection and segmentation of parabolic trough collector and Fresnel mirrors for CSP maintenance using YOLOv8 and Segment Anything Model</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, A. Moulay Taj, Y. El Jarida, I. Bouarfa, A. Mouaky, M. El Ydrissi, E.G. Bennouna, H. Ghennioui</div>
+          <div class="pub-venue">The Visual Computer, vol. 42, p. 233 · 2026</div>
+          <a class="pub-doi" href="https://doi.org/10.1007/s00371-026-04415-z">doi:10.1007/s00371-026-04415-z</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">YOLOv8</span><span class="badge badge-purple">SAM</span><span class="badge badge-cyan">Segmentation</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">04</div>
+        <div class="pub-body">
+          <div class="pub-title">A machine learning approach for forecasting soiling in concentrated solar power plants</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, A. Moulay Taj, M. El Ydrissi, I. Bouarfa, M. Abraim, E.G. Bennouna, H. Ghennioui</div>
+          <div class="pub-venue">Solar Energy Materials and Solar Cells, p. 114200 · 2026</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.solmat.2026.114200">doi:10.1016/j.solmat.2026.114200</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">Machine Learning</span><span class="badge badge-orange">Soiling Forecast</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">05</div>
+        <div class="pub-body">
+          <div class="pub-title">Comparing machine learning algorithms for imputation of missing time series in meteorological data</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, M. El Ydrissi, M. Abraim, I. Bouarfa, O. El Alani, H. Ghennioui, E.G. Bennouna</div>
+          <div class="pub-venue">Neural Computing and Applications, vol. 37, no. 29, pp. 23773–23787 · 2025</div>
+          <a class="pub-doi" href="https://doi.org/10.1007/s00521-024-10601-8">doi:10.1007/s00521-024-10601-8</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">Time Series</span><span class="badge badge-green">Data Imputation</span><span class="badge badge-cyan">Meteorological</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">06</div>
+        <div class="pub-body">
+          <div class="pub-title">Impact of dust accumulation on PV and CSP systems: Experimental analysis and simulation insights in semi-arid climate</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, M. El Ydrissi, M. Abraim, A. Moulay Taj, I. Bouarfa, E.G. Bennouna, H. Ghennioui</div>
+          <div class="pub-venue">Solar Energy, vol. 296, p. 113602 · 2025</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.solener.2025.113602">doi:10.1016/j.solener.2025.113602</a>
+          <div style="margin-top:8px;"><span class="badge badge-orange">Dust Soiling</span><span class="badge badge-blue">PV</span><span class="badge badge-cyan">CSP</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">07</div>
+        <div class="pub-body">
+          <div class="pub-title">CFD–ANN-based model for parametric analysis of segmented plate-fin heat sinks: heat transfer and pressure drop trade-offs</div>
+          <div class="pub-authors">A. Dadda, <strong>Boujoudar M.</strong>, N. Houran, H. Messaoudi, M. Asbik, A. Haddou, A. Arshad</div>
+          <div class="pub-venue">International Journal of Thermal Sciences, vol. 218, p. 110109 · 2025</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.ijthermalsci.2025.110109">doi:10.1016/j.ijthermalsci.2025.110109</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">CFD</span><span class="badge badge-purple">ANN</span><span class="badge badge-green">Heat Transfer</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">08</div>
+        <div class="pub-body">
+          <div class="pub-title">Developing optical and thermal models with experimental validation of parabolic trough collector for Moroccan industrial heat applications</div>
+          <div class="pub-authors">I. Bouarfa, M. El Ydrissi, H. El Hafdaoui, <strong>Boujoudar M.</strong>, A. Jamil, E.G. Bennouna</div>
+          <div class="pub-venue">Solar Energy Materials and Solar Cells, vol. 266, p. 112676 · 2024</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.solmat.2023.112676">doi:10.1016/j.solmat.2023.112676</a>
+          <div style="margin-top:8px;"><span class="badge badge-cyan">Parabolic Trough</span><span class="badge badge-orange">Thermal Model</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">09</div>
+        <div class="pub-body">
+          <div class="pub-title">PVSMS: A system for quantifying soiling effects and optimizing cleaning schedule in PV solar plants</div>
+          <div class="pub-authors">M. Abraim, M. El Ydrissi, H. Ghennioui, A. Ghennioui, N. Hanrieder, S. Wilbert, O. El Alani, <strong>Boujoudar M.</strong>, A. Azouzoute</div>
+          <div class="pub-venue">Energy Conversion and Management, vol. 284, p. 116978 · 2023</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/j.enconman.2023.116978">doi:10.1016/j.enconman.2023.116978</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">PV Soiling</span><span class="badge badge-green">Cleaning Optimization</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="journal">
+        <div class="pub-number">10</div>
+        <div class="pub-body">
+          <div class="pub-title">Comparing photovoltaic power prediction: ground-based measurements vs. satellite data using an ANN model</div>
+          <div class="pub-authors">C. Hajjaj, M. El Ydrissi, A. Azouzoute, A. Oufadel, O. El Alani, <strong>Boujoudar M.</strong>, M. Abraim, A. Ghennioui</div>
+          <div class="pub-venue">IEEE Journal of Photovoltaics, vol. 13, no. 6, pp. 998–1006 · 2023</div>
+          <a class="pub-doi" href="https://doi.org/10.1109/JPHOTOV.2023.3306827">doi:10.1109/JPHOTOV.2023.3306827</a>
+          <div style="margin-top:8px;"><span class="badge badge-blue">IEEE</span><span class="badge badge-cyan">PV Forecasting</span><span class="badge badge-purple">ANN</span></div>
+        </div>
+      </div>
+
+      <!-- CONFERENCE -->
+      <div class="pub-card reveal" data-type="conference">
+        <div class="pub-number">C1</div>
+        <div class="pub-body">
+          <div class="pub-title">Power PV forecasting using machine learning algorithms based on weather data in semi-arid climate</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, I. Bouarfa, A. Dadda, M. El Ydrissi, A. Moulay Taj, M. Abraim, H. Ghennioui, E.G. Bennouna</div>
+          <div class="pub-venue">BIO Web of Conferences, vol. 109, p. 01024 · 2024</div>
+          <a class="pub-doi" href="https://doi.org/10.1051/bioconf/202410901024">doi:10.1051/bioconf/202410901024</a>
+          <div style="margin-top:8px;"><span class="badge badge-green">Conference</span><span class="badge badge-blue">PV Forecast</span></div>
+        </div>
+      </div>
+
+      <!-- BOOK CHAPTERS -->
+      <div class="pub-card reveal" data-type="book">
+        <div class="pub-number">B1</div>
+        <div class="pub-body">
+          <div class="pub-title">Experimental investigation of the interaction between PV soiling loss and atmospheric and climatic conditions: a case study of Morocco</div>
+          <div class="pub-authors">M. Abraim, M. El Ydrissi, O. El Alani, H. Ghennioui, A. Ghennioui, <strong>Boujoudar M.</strong>, A. Azouzoute</div>
+          <div class="pub-venue">Book Chapter · 2024, pp. 181–196</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/B978-0-443-13392-3.00009-8">doi:10.1016/B978-0-443-13392-3.00009-8</a>
+          <div style="margin-top:8px;"><span class="badge badge-purple">Book Chapter</span><span class="badge badge-orange">PV Soiling</span></div>
+        </div>
+      </div>
+
+      <div class="pub-card reveal" data-type="book">
+        <div class="pub-number">B2</div>
+        <div class="pub-body">
+          <div class="pub-title">Design and development of a low-cost single-axis solar tracking system</div>
+          <div class="pub-authors"><strong>Boujoudar M.</strong>, I. Bouarfa, M. El Ydrissi, M. Abraim, O. El Alani, E.G. Bennouna, H. Ghennioui</div>
+          <div class="pub-venue">Book Chapter · 2024, pp. 359–373</div>
+          <a class="pub-doi" href="https://doi.org/10.1016/B978-0-443-13392-3.00018-9">doi:10.1016/B978-0-443-13392-3.00018-9</a>
+          <div style="margin-top:8px;"><span class="badge badge-purple">Book Chapter</span><span class="badge badge-cyan">Solar Tracking</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── PROJECTS ─────────────────── -->
+<section id="projects" style="background: rgba(8,15,30,0.5);">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Academic Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid">
+
+      <div class="card project-card reveal">
+        <div class="project-header">
+          <div class="project-icon">🎯</div>
+          <div class="project-year">2023 – 2024</div>
+        </div>
+        <div class="project-title">Intelligent Soiling Detection System for CSP Plants</div>
+        <div class="project-desc">AI-based framework for automatic detection and quantification of mirror soiling using deep learning and image processing. Validated with real operational CSP data.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">Deep Learning</span>
+          <span class="badge badge-cyan">Computer Vision</span>
+          <span class="badge badge-green">CSP</span>
+        </div>
+      </div>
+
+      <div class="card project-card reveal" style="transition-delay:0.05s">
+        <div class="project-header">
+          <div class="project-icon">📡</div>
+          <div class="project-year">2022 – 2023</div>
+        </div>
+        <div class="project-title">IoT Solar Tracking System with SPA Algorithm</div>
+        <div class="project-desc">Real-time IoT architecture for solar tracking using Solar Position Algorithm (SPA). Integrates sensors, microcontrollers, and communication protocols for automated CSP collector orientation.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">IoT</span>
+          <span class="badge badge-purple">SPA Algorithm</span>
+          <span class="badge badge-orange">Automation</span>
+        </div>
+      </div>
+
+      <div class="card project-card reveal" style="transition-delay:0.1s">
+        <div class="project-header">
+          <div class="project-icon">😷</div>
+          <div class="project-year">2020 – 2021</div>
+        </div>
+        <div class="project-title">Face Mask Detector — CNN with OpenCV &amp; Keras</div>
+        <div class="project-desc">Real-time face mask detection using a CNN classification model. Deployed on live webcam stream. Data preprocessing with NumPy, SciPy, and Pandas.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">CNN</span>
+          <span class="badge badge-cyan">OpenCV</span>
+          <span class="badge badge-green">Keras</span>
+          <span class="badge badge-purple">TensorFlow</span>
+        </div>
+      </div>
+
+      <div class="card project-card reveal" style="transition-delay:0.15s">
+        <div class="project-header">
+          <div class="project-icon">⚡</div>
+          <div class="project-year">2020 – 2021</div>
+        </div>
+        <div class="project-title">Web Application for Energy Monitoring Dashboard</div>
+        <div class="project-desc">Collected and processed data from MATLAB-based energy simulations, then designed an interactive dashboard for real-time energy data visualization.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">MATLAB</span>
+          <span class="badge badge-cyan">Dashboard</span>
+          <span class="badge badge-green">Web Dev</span>
+        </div>
+      </div>
+
+      <div class="card project-card reveal" style="transition-delay:0.2s">
+        <div class="project-header">
+          <div class="project-icon">🌐</div>
+          <div class="project-year">2019 – 2020</div>
+        </div>
+        <div class="project-title">Web Services Platform with JAX-WS API</div>
+        <div class="project-desc">Student registration and absence management system as web services. Includes library management service with add, search, and update operations.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">Java</span>
+          <span class="badge badge-cyan">JAX-WS</span>
+          <span class="badge badge-green">Web Services</span>
+          <span class="badge badge-purple">Database</span>
+        </div>
+      </div>
+
+      <div class="card project-card reveal" style="transition-delay:0.25s">
+        <div class="project-header">
+          <div class="project-icon">🔌</div>
+          <div class="project-year">2019 – 2020</div>
+        </div>
+        <div class="project-title">Network Architecture — Packet Tracer</div>
+        <div class="project-desc">Configured routers and switches with IP addressing, VLANs, and inter-VLAN routing. Implemented and tested TFTP, FTP, and STP network protocols.</div>
+        <div class="project-tags">
+          <span class="badge badge-blue">Networking</span>
+          <span class="badge badge-orange">VLANs</span>
+          <span class="badge badge-cyan">Packet Tracer</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── PATENT ─────────────────── -->
+<section id="patent">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Patent</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="card patent-card reveal" style="max-width:760px;">
+      <div class="patent-seal">🏛️</div>
+      <div class="patent-info">
+        <h3>Accepted Invention Patent — OMPIC Morocco</h3>
+        <p><strong style="color:var(--text)">Title:</strong> Process and system for determining mirror reflectivity in concentrated solar power plants using nighttime image analysis and artificial intelligence.</p>
+        <p style="margin-top:8px;"><strong style="color:var(--text)">Inventor:</strong> Mohamed Boujoudar</p>
+        <p><strong style="color:var(--text)">Patent Office:</strong> Moroccan Office of Industrial and Commercial Property (OMPIC)</p>
+        <p><strong style="color:var(--text)">Year:</strong> 2024</p>
+        <div class="patent-status">Accepted &amp; Registered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── REFERENCES ─────────────────── -->
+<section id="references" style="background: rgba(8,15,30,0.5);">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">08</span>
+      <h2 class="section-title">References</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="ref-grid">
+      <div class="card ref-card reveal">
+        <div class="ref-avatar">HG</div>
+        <div class="ref-name">Prof. Hicham Ghennioui</div>
+        <div class="ref-role">Professor of Higher Education</div>
+        <div class="ref-org">Sidi Mohamed Ben Abdellah University, Fez, Morocco</div>
+        <a href="mailto:Hicham.Ghennioui@usmba.ac.ma" class="ref-email">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Hicham.Ghennioui@usmba.ac.ma
+        </a>
+      </div>
+      <div class="card ref-card reveal" style="transition-delay:0.1s">
+        <div class="ref-avatar" style="background:linear-gradient(135deg,var(--cyan),var(--green))">EB</div>
+        <div class="ref-name">Dr. El Ghali Bennouna</div>
+        <div class="ref-role">Head of CSP Energy &amp; Thermal Storage</div>
+        <div class="ref-org">Green Energy Park, Benguerir, Morocco</div>
+        <a href="mailto:Bennouna@Greenenergypark.ma" class="ref-email">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Bennouna@Greenenergypark.ma
+        </a>
+      </div>
+      <div class="card ref-card reveal" style="transition-delay:0.2s">
+        <div class="ref-avatar" style="background:linear-gradient(135deg,var(--orange),var(--purple))">ME</div>
+        <div class="ref-name">Dr. Massaab El Ydrissi</div>
+        <div class="ref-role">Solar Project Manager</div>
+        <div class="ref-org">INNOVX, UM6P, Benguerir, Morocco</div>
+        <a href="mailto:massaabelydrissi@gmail.com" class="ref-email">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          massaabelydrissi@gmail.com
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── FOOTER ─────────────────── -->
+<footer>
+  <div class="container">
+    <p>Mohamed Boujoudar · PhD Researcher · <a href="mailto:Mohamed.boujoudar1@usmba.ac.ma">Mohamed.boujoudar1@usmba.ac.ma</a></p>
+    <p style="margin-top:8px; color: var(--text-dim);">// Built with ❤️ for science and innovation — 2024</p>
+  </div>
+</footer>
+
+<script>
+// ── NEURAL NETWORK CANVAS ──────────────────────────────────────
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+let nodes = [], W, H, animId;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initNodes() {
+  nodes = [];
+  const count = Math.min(70, Math.floor((W * H) / 18000));
+  for (let i = 0; i < count; i++) {
+    nodes.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 2.5 + 1,
+    });
+  }
+}
+
+function drawNeural() {
+  ctx.clearRect(0, 0, W, H);
+  // move
+  for (const n of nodes) {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  }
+  // edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 160) {
+        const alpha = (1 - d / 160) * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(56,139,253,${alpha})`;
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+      }
+    }
+  }
+  // nodes
+  for (const n of nodes) {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(57,208,216,0.7)';
+    ctx.fill();
+  }
+  animId = requestAnimationFrame(drawNeural);
+}
+
+window.addEventListener('resize', () => { resize(); initNodes(); });
+resize(); initNodes(); drawNeural();
+
+// ── TYPED ROLE ─────────────────────────────────────────────────
+const roles = [
+  'PhD Researcher in AI & Renewable Energy',
+  'Computer Vision Engineer',
+  'Deep Learning Specialist',
+  'IoT & CSP Systems Developer',
+  'Published Researcher · 10+ Papers',
+];
+let ri = 0, ci = 0, deleting = false;
+const roleEl = document.getElementById('typed-role');
+
+function typeRole() {
+  const word = roles[ri];
+  if (!deleting) {
+    roleEl.textContent = word.slice(0, ++ci);
+    if (ci === word.length) { deleting = true; setTimeout(typeRole, 1800); return; }
+  } else {
+    roleEl.textContent = word.slice(0, --ci);
+    if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+  }
+  setTimeout(typeRole, deleting ? 40 : 70);
+}
+typeRole();
+
+// ── SCROLL REVEAL ──────────────────────────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── LANGUAGE BARS ──────────────────────────────────────────────
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.lang-fill').forEach(b => {
+        b.style.width = b.dataset.width;
+      });
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.about-card').forEach(c => barObserver.observe(c));
+
+// ── PUBLICATION FILTER ─────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.pub-card').forEach(card => {
+      const show = filter === 'all' || card.dataset.type === filter;
+      card.style.display = show ? 'flex' : 'none';
+    });
+  });
+});
+
+// ── ACTIVE NAV ON SCROLL ───────────────────────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => navObserver.observe(s));
+
+// ── SMOOTH HOVER GLOW ON CARDS ─────────────────────────────────
+document.querySelectorAll('.card, .pub-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    card.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(56,139,253,0.08) 0%, rgba(13,22,40,0.7) 60%)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.background = '';
+  });
+});
+</script>
+</body>
+</html>
